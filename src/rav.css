@@ -1,0 +1,3 @@
+.rav-fill-screen { @apply absolute h-screen w-screen;}
+.rav-flex-center { @apply flex items-center justify-center align-middle w-full h-full;}
+.rav-bg-cover {@apply relative object-cover overflow-hidden;}
