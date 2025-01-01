@@ -13,15 +13,17 @@
     let verticalMode: boolean
     let pageLoaded: boolean
     let enableScroll: boolean
+    let introFinished: boolean
     let backdropEl: HTMLElement, parentEl: HTMLElement
 
     const images = () => {
-        return $darkmode ? Images() : Images().reverse
+        return $darkmode ? Images() : Images().reverse()
     }
     numIntroFinished.subscribe((val)=>{
         if (val === gridAmmount - 1){
             AssignAnimation(2)
             ToggleBlackOverlay(true)
+            introFinished = true
         }
     })
     scrollX.subscribe((n)=>{
@@ -30,12 +32,12 @@
     function OnPageLoad(){
         SetGridAmmount()
         AssignAnimation(1)
+        pageLoaded = true
     }
     function SetGridAmmount(){
         let result = GetGridBasedOnRatio(innerWidth, innerHeight)
         gridAmmount = result.gridAmmount
         verticalMode = result.verticalMode
-        pageLoaded = true
         $scrollX = 0.0
     }
     function AssignAnimation(num: number){
@@ -45,11 +47,12 @@
         backdropEl?.classList.add(`anim-scale-${num}`)
     }
     function ToggleBlackOverlay(enable: boolean){
-        backdropEl?.classList.add(`black-overlay-enable`)
+        backdropEl?.classList.add(`black-overlay-${enable ? "enable" : "disable"}`)
     }
     onMount(() => {
         OnPageLoad()
     })
+    
 </script>
 
 <svelte:window
@@ -62,11 +65,20 @@ on:wheel={(e) => {
 
 <div class="rav-fill-screen overflow-hidden"
 bind:this={parentEl}>
-    <button class="absolute w-20 h-20 top-0 z-50 bg-white"
-    on:click={()=>{
-        enableScroll = !enableScroll
-        $scrollX = 0.0
-    }}> Scroll </button>
+    <section class="flex gap-2 flex-row p-8 absolute w-60 h-32 top-0 z-50">
+        <button class="w-1/2 top-0 bg-white"
+        on:click={()=>{
+            enableScroll = !enableScroll
+            $scrollX = 0.0
+        }}> Scroll </button>
+        <button class="w-1/2 top-0 bg-white"
+        on:click={()=>{
+            $darkmode = !$darkmode
+            pageLoaded = false
+            setTimeout(() => {pageLoaded = true}, DURATION / 1.5)
+        }}> Dark Mode </button>
+    </section>
+
     <div class="grid h-full
     {verticalMode ? "grid-flow-row" : "grid-flow-col"}
     {enableScroll ? (gridAmmount === 4 ? "w-[300vw]" : "w-[400vw]") : "w-full"}"
@@ -78,9 +90,10 @@ bind:this={parentEl}>
                     bind:imgData
                     bind:index={() => i, (_) => null}
                     bind:duration={() => DURATION, (_) => null}
-                    bind:delayDevider={() => DELAY_DEVIDER, (_) => null}/>
+                    bind:delayDevider={() => !introFinished ? DELAY_DEVIDER : 0, (_) => null}/>
             {/if}
         {/each}
+        
         <!-- Rest of the images -->
         {#if enableScroll}
             {#each images().slice(gridAmmount, images().length) as imgData, i}

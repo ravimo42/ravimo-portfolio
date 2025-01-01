@@ -1,5 +1,5 @@
 <script lang='ts'>
-	import { quartOut } from "svelte/easing";
+	import { quintOut } from "svelte/easing";
     import { fly } from "svelte/transition";
     import { numIntroFinished } from "$lib/store/store"
 
@@ -12,11 +12,11 @@
 
 <section
 transition:fly={{
-        delay: duration / delayDevider * index,
+        delay: delayDevider !== 0 ? duration / delayDevider * index : 0,
         duration: duration,
         opacity: 100,
         y: innerHeight * (index % 2 ? -1 : 1),
-        easing: quartOut,
+        easing: quintOut,
     }}
     on:introend={() => { if (duration !== 0) $numIntroFinished += 1}}>
     <enhanced:img
