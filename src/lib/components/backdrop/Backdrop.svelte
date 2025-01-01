@@ -4,6 +4,7 @@
     import { GetGridBasedOnRatio } from "$lib/utils/AspectRatio"
     import { numIntroFinished, darkmode } from "$lib/store/store"
     import { Scroll, UpdateScroll, scrollX } from "$lib/utils/Scroll"
+	import { onMount } from "svelte";
 
     const DURATION = 800.0
     const DELAY_DEVIDER = 2.5
@@ -46,10 +47,12 @@
     function ToggleBlackOverlay(enable: boolean){
         backdropEl?.classList.add(`black-overlay-enable`)
     }
+    onMount(() => {
+        OnPageLoad()
+    })
 </script>
 
 <svelte:window
-on:load={OnPageLoad}
 on:resize={SetGridAmmount}
 on:wheel={(e) => {
     if (enableScroll) {
@@ -66,7 +69,7 @@ bind:this={parentEl}>
     }}> Scroll </button>
     <div class="grid h-full
     {verticalMode ? "grid-flow-row" : "grid-flow-col"}
-    {enableScroll ? `w-[${100 * (7 - gridAmmount)}vw]` : "w-full"}"
+    {enableScroll ? (gridAmmount === 4 ? "w-[300vw]" : "w-[400vw]") : "w-full"}"
     bind:this={backdropEl}>
         <!-- First 3-4 images -->
         {#each images().slice(0, gridAmmount) as imgData, i}
