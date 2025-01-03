@@ -2,8 +2,6 @@
 import { quintOut } from "svelte/easing"
 import { tweened } from "svelte/motion"
 
-
-
 export let scrollX = tweened(
     0.0,
     { duration: 1000, easing: quintOut }

@@ -22,5 +22,6 @@ transition:fly={{
     <enhanced:img
         class="object-cover cursor-pointer h-full"
         src={imgData.imgLow.default}
-        alt=""/>
+        alt=""
+        loading="lazy"/>
 </section>

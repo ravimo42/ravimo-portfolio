@@ -15,14 +15,23 @@
     let enableScroll: boolean
     let introFinished: boolean
     let backdropEl: HTMLElement, parentEl: HTMLElement
-
-    const images = () => {
-        return $darkmode ? Images() : Images().reverse()
+    
+    const copyImgs = [...Images()]
+    const GetImgs = (darkmode: boolean | string) => {
+        return darkmode ? copyImgs : copyImgs.toReversed()
     }
+    const GridClass = () => {
+        return `absolute grid h-full
+        ${verticalMode ? "grid-flow-row" : "grid-flow-col"}
+        ${enableScroll ? (gridAmmount === 4 ? "w-[300vw]" : "w-[400vw]") : "w-full"}`
+    }
+
     numIntroFinished.subscribe((val)=>{
         if (val === gridAmmount - 1){
             AssignAnimation(2)
             ToggleBlackOverlay(true)
+        }
+        if (val === gridAmmount){
             introFinished = true
         }
     })
@@ -63,8 +72,7 @@ on:wheel={(e) => {
     }
 }}/>
 
-<div class="rav-fill-screen overflow-hidden"
-bind:this={parentEl}>
+<div class="rav-fill-screen overflow-hidden" bind:this={parentEl}>
     <section class="flex gap-2 flex-row p-8 absolute w-60 h-32 top-0 z-50">
         <button class="w-1/2 top-0 bg-white"
         on:click={()=>{
@@ -72,19 +80,14 @@ bind:this={parentEl}>
             $scrollX = 0.0
         }}> Scroll </button>
         <button class="w-1/2 top-0 bg-white"
-        on:click={()=>{
-            $darkmode = !$darkmode
-            pageLoaded = false
-            setTimeout(() => {pageLoaded = true}, DURATION / 1.5)
-        }}> Dark Mode </button>
+        on:click={()=>{$darkmode = !$darkmode}}>
+        Dark Mode </button>
     </section>
 
-    <div class="grid h-full
-    {verticalMode ? "grid-flow-row" : "grid-flow-col"}
-    {enableScroll ? (gridAmmount === 4 ? "w-[300vw]" : "w-[400vw]") : "w-full"}"
-    bind:this={backdropEl}>
+    <div class="{GridClass()}" bind:this={backdropEl}>
         <!-- First 3-4 images -->
-        {#each images().slice(0, gridAmmount) as imgData, i}
+        <!-- Darkmode images -->
+        {#each GetImgs(enableScroll ? $darkmode : true).slice(0, gridAmmount) as imgData, i}
             {#if pageLoaded }
                 <BackdropImage
                     bind:imgData
@@ -93,10 +96,25 @@ bind:this={parentEl}>
                     bind:delayDevider={() => !introFinished ? DELAY_DEVIDER : 0, (_) => null}/>
             {/if}
         {/each}
-        
+
+        <!-- Lightmode images -->
+        <span class="{GridClass()}">
+        {#if !enableScroll}
+            {#each GetImgs(false).slice(0, gridAmmount) as imgData, i}
+                {#if introFinished && !$darkmode}
+                    <BackdropImage
+                        bind:imgData
+                        bind:index={() => i, (_) => null}
+                        bind:duration={() => DURATION, (_) => null}
+                        bind:delayDevider={() => 8, (_) => null}/>
+                {/if}
+            {/each}
+        {/if}
+        </span>
+
         <!-- Rest of the images -->
         {#if enableScroll}
-            {#each images().slice(gridAmmount, images().length) as imgData, i}
+            {#each GetImgs($darkmode).slice(gridAmmount, GetImgs($darkmode === "true" ? true : false).length) as imgData, i}
                     <BackdropImage bind:imgData/>
             {/each}
         {/if}
