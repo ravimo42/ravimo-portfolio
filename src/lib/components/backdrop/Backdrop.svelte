@@ -107,8 +107,7 @@ on:wheel={OnScroll}/>
                         bind:imgData
                         bind:index={() => i, (_) => null}
                         bind:duration={() => DURATION, (_) => null}
-                        bind:delayDevider={() => 8, (_) => null}
-                        bind:fadeOut={() => true, (_) => null}/>
+                        bind:delayDevider={() => 8, (_) => null}/>
                 {/if}
             {/each}
         {/if}
@@ -121,6 +120,7 @@ on:wheel={OnScroll}/>
             {/each}
         {/if}
     </div>
+    
     <!-- Blocker -->
     {#if !portfolioScroll && introFinished}
         <!-- svelte-ignore element_invalid_self_closing_tag -->

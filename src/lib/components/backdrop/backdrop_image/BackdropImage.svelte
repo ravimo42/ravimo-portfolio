@@ -8,7 +8,6 @@
     export let index = 0
     export let duration = 0
     export let delayDevider = 0
-    export let fadeOut = false
 
     let openPreviewer = false
 
@@ -24,7 +23,7 @@
 transition:fly={{
         delay: delayDevider !== 0 ? duration / delayDevider * index : 0,
         duration: duration,
-        opacity: fadeOut ? 0 : 100,
+        opacity: 100,
         y: innerHeight * (index % 2 ? -1 : 1),
         easing: quintOut,
     }}
