@@ -37,7 +37,7 @@
             loading="lazy"
             on:click={()=>{}}/>
     </div>
-    <button class="bg-black text-white absolute"
+    <button class="absolute m-12 p-4 top-0 right-0 bg-white font-bold text-2xl rounded-xl z-50 active:scale-90 duration-100"
     on:click={OnClick}>
         CLOSE
     </button>

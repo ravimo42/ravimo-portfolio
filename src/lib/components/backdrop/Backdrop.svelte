@@ -72,14 +72,14 @@ on:resize={SetGridAmmount}
 on:wheel={OnScroll}/>
 
 <div class="rav-fill-screen overflow-hidden" bind:this={parentEl}>
-    <section class="flex gap-2 flex-row p-8 absolute w-60 h-32 top-0 z-50">
-        <button class="w-1/2 top-0 bg-white"
+    <section class="flex gap-2 flex-row p-8 absolute w-80 h-32 top-0 z-50">
+        <button class="p-2 top-0 bg-white font-bold text-2xl rounded-xl active:scale-90 duration-100"
         on:click={()=>{
             $enableScroll = !$enableScroll
             portfolioScroll = !portfolioScroll
             $scrollX = 0.0
         }}> Scroll </button>
-        <button class="w-1/2 top-0 bg-white"
+        <button class="p-2 top-0 bg-white font-bold text-2xl rounded-xl active:scale-90 duration-100"
         on:click={()=>{$darkmode = !$darkmode}}>
         Dark Mode </button>
     </section>
