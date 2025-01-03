@@ -2,9 +2,10 @@
     import BackdropImage from "./backdrop_image/BackdropImage.svelte"
     import { Images } from "./backdrop_images/BackdropImages.svelte"
     import { GetGridBasedOnRatio } from "$lib/utils/AspectRatio"
-    import { numIntroFinished, darkmode } from "$lib/store/store"
+    import { darkmode, numIntroFinished, enableScroll } from "$lib/store/store"
     import { Scroll, UpdateScroll, scrollX } from "$lib/utils/Scroll"
 	import { onMount } from "svelte";
+	import { fade } from "svelte/transition";
 
     const DURATION = 800.0
     const DELAY_DEVIDER = 2.5
@@ -12,9 +13,10 @@
     let gridAmmount: number
     let verticalMode: boolean
     let pageLoaded: boolean
-    let enableScroll: boolean
     let introFinished: boolean
     let backdropEl: HTMLElement, parentEl: HTMLElement
+
+    let portfolioScroll = false
     
     const copyImgs = [...Images()]
     const GetImgs = (darkmode: boolean | string) => {
@@ -23,13 +25,12 @@
     const GridClass = () => {
         return `absolute grid h-full
         ${verticalMode ? "grid-flow-row" : "grid-flow-col"}
-        ${enableScroll ? (gridAmmount === 4 ? "w-[300vw]" : "w-[400vw]") : "w-full"}`
+        ${portfolioScroll ? (gridAmmount === 4 ? "w-[300vw]" : "w-[400vw]") : "w-full"}`
     }
 
     numIntroFinished.subscribe((val)=>{
         if (val === gridAmmount - 1){
             AssignAnimation(2)
-            ToggleBlackOverlay(true)
         }
         if (val === gridAmmount){
             introFinished = true
@@ -55,8 +56,10 @@
         root?.style.setProperty('--anim-dur', dur.toString())
         backdropEl?.classList.add(`anim-scale-${num}`)
     }
-    function ToggleBlackOverlay(enable: boolean){
-        backdropEl?.classList.add(`black-overlay-${enable ? "enable" : "disable"}`)
+    function OnScroll(event: WheelEvent){
+        if ($enableScroll) {
+            Scroll(event, verticalMode, gridAmmount, window)
+        }
     }
     onMount(() => {
         OnPageLoad()
@@ -66,17 +69,14 @@
 
 <svelte:window
 on:resize={SetGridAmmount}
-on:wheel={(e) => {
-    if (enableScroll) {
-        Scroll(e, verticalMode, gridAmmount, window)
-    }
-}}/>
+on:wheel={OnScroll}/>
 
 <div class="rav-fill-screen overflow-hidden" bind:this={parentEl}>
     <section class="flex gap-2 flex-row p-8 absolute w-60 h-32 top-0 z-50">
         <button class="w-1/2 top-0 bg-white"
         on:click={()=>{
-            enableScroll = !enableScroll
+            $enableScroll = !$enableScroll
+            portfolioScroll = !portfolioScroll
             $scrollX = 0.0
         }}> Scroll </button>
         <button class="w-1/2 top-0 bg-white"
@@ -86,8 +86,9 @@ on:wheel={(e) => {
 
     <div class="{GridClass()}" bind:this={backdropEl}>
         <!-- First 3-4 images -->
+
         <!-- Darkmode images -->
-        {#each GetImgs(enableScroll ? $darkmode : true).slice(0, gridAmmount) as imgData, i}
+        {#each GetImgs(portfolioScroll ? $darkmode : true).slice(0, gridAmmount) as imgData, i}
             {#if pageLoaded }
                 <BackdropImage
                     bind:imgData
@@ -99,37 +100,40 @@ on:wheel={(e) => {
 
         <!-- Lightmode images -->
         <span class="{GridClass()}">
-        {#if !enableScroll}
+        {#if !portfolioScroll}
             {#each GetImgs(false).slice(0, gridAmmount) as imgData, i}
                 {#if introFinished && !$darkmode}
                     <BackdropImage
                         bind:imgData
                         bind:index={() => i, (_) => null}
                         bind:duration={() => DURATION, (_) => null}
-                        bind:delayDevider={() => 8, (_) => null}/>
+                        bind:delayDevider={() => 8, (_) => null}
+                        bind:fadeOut={() => true, (_) => null}/>
                 {/if}
             {/each}
         {/if}
         </span>
 
         <!-- Rest of the images -->
-        {#if enableScroll}
+        {#if portfolioScroll}
             {#each GetImgs($darkmode).slice(gridAmmount, GetImgs($darkmode === "true" ? true : false).length) as imgData, i}
                     <BackdropImage bind:imgData/>
             {/each}
         {/if}
     </div>
+    <!-- Blocker -->
+    {#if !portfolioScroll && introFinished}
+        <!-- svelte-ignore element_invalid_self_closing_tag -->
+        <span class="rav-fill-screen bg-black opacity-20 z-10"
+        transition:fade={{
+            duration: 300
+        }}/>
+    {/if}
 </div>
 
 <style>
     :global(:root){
         --anim-dur: 0;
-    }
-    :global(.black-overlay-enable){
-        @apply pointer-events-none opacity-80;
-    }
-    :global(.black-overlay-disable){
-        @apply pointer-events-none opacity-100;
     }
     :global(.anim-scale-1) {
         animation-name: s-1;
