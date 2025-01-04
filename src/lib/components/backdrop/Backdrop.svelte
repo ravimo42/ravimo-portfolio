@@ -56,6 +56,11 @@
         root?.style.setProperty('--anim-dur', dur.toString())
         backdropEl?.classList.add(`anim-scale-${num}`)
     }
+    function TogglePortfolioScroll(){
+        $enableScroll = !$enableScroll
+        portfolioScroll = !portfolioScroll
+        $scrollX = 0.0
+    }
     function OnScroll(event: WheelEvent){
         if ($enableScroll) {
             Scroll(event, verticalMode, gridAmmount, window)
@@ -74,11 +79,7 @@ on:wheel={OnScroll}/>
 <div class="rav-fill-screen overflow-hidden" bind:this={parentEl}>
     <section class="flex gap-2 flex-row p-8 absolute w-80 h-32 top-0 z-50">
         <button class="p-2 top-0 bg-white font-bold text-2xl rounded-xl active:scale-90 duration-100"
-        on:click={()=>{
-            $enableScroll = !$enableScroll
-            portfolioScroll = !portfolioScroll
-            $scrollX = 0.0
-        }}> Scroll </button>
+        on:click={TogglePortfolioScroll}> Scroll </button>
         <button class="p-2 top-0 bg-white font-bold text-2xl rounded-xl active:scale-90 duration-100"
         on:click={()=>{$darkmode = !$darkmode}}>
         Dark Mode </button>
@@ -123,11 +124,10 @@ on:wheel={OnScroll}/>
     
     <!-- Blocker -->
     {#if !portfolioScroll && introFinished}
-        <!-- svelte-ignore element_invalid_self_closing_tag -->
         <span class="rav-fill-screen bg-black opacity-20 z-10"
         transition:fade={{
             duration: 300
-        }}/>
+        }}></span>
     {/if}
 </div>
 
