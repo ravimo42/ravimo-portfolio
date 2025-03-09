@@ -4,14 +4,13 @@
     import { GetGridBasedOnRatio } from "$lib/utils/AspectRatio"
     import { darkmode, numIntroFinished, enableScroll } from "$lib/store/store"
     import { Scroll, UpdateScroll, scrollX } from "$lib/utils/Scroll"
-	import { onMount } from "svelte";
-	import { fade } from "svelte/transition";
+	import { onMount } from "svelte"
+	import { fade } from "svelte/transition"
 
     const DURATION = 800.0
     const DELAY_DEVIDER = 2.5
 
     let gridAmmount: number
-    let verticalMode: boolean
     let pageLoaded: boolean
     let introFinished: boolean
     let backdropEl: HTMLElement, parentEl: HTMLElement
@@ -22,10 +21,23 @@
     const GetImgs = (darkmode: boolean | string) => {
         return darkmode ? copyImgs : copyImgs.toReversed()
     }
-    const GridClass = () => {
-        return `absolute grid h-full
-        ${verticalMode ? "grid-flow-row" : "grid-flow-col"}
-        ${portfolioScroll ? (gridAmmount === 4 ? "w-[300vw]" : "w-[400vw]") : "w-full"}`
+    const GridClass = (pS: boolean, gA: number) => {
+        let vw = ""
+        switch (gA){
+            case 3:
+                vw = "w-[400vw]"
+                break
+            case 4:
+                vw = "w-[300vw]"
+                break
+            default:
+                vw = "w-[1200vw]"
+        }
+        // This below doesn't work for some reason
+        //let sizeW = GetImgs($darkmode).length / gA
+        //let vw = `w-[${(sizeW * 100).toString()}vw]`
+        return `absolute grid grid-flow-col
+        ${pS ? `${vw} h-full` : "h-full w-full"}`
     }
 
     numIntroFinished.subscribe((val)=>{
@@ -37,7 +49,7 @@
         }
     })
     scrollX.subscribe((n)=>{
-        UpdateScroll(verticalMode, n, parentEl)
+        UpdateScroll(n, parentEl)
     })
     function OnPageLoad(){
         SetGridAmmount()
@@ -45,16 +57,16 @@
         pageLoaded = true
     }
     function SetGridAmmount(){
-        let result = GetGridBasedOnRatio(innerWidth, innerHeight)
-        gridAmmount = result.gridAmmount
-        verticalMode = result.verticalMode
+        gridAmmount = GetGridBasedOnRatio(innerWidth, innerHeight)
         $scrollX = 0.0
     }
     function AssignAnimation(num: number){
         const root: HTMLElement | null = document.querySelector(":root")
         const dur = (gridAmmount + 1) * (DURATION / DELAY_DEVIDER)
         root?.style.setProperty('--anim-dur', dur.toString())
-        backdropEl?.classList.add(`anim-scale-${num}`)
+        if (gridAmmount != 1) {
+            backdropEl?.classList.add(`anim-scale-${num}`)
+        }
     }
     function TogglePortfolioScroll(){
         $enableScroll = !$enableScroll
@@ -63,7 +75,13 @@
     }
     function OnScroll(event: WheelEvent){
         if ($enableScroll) {
-            Scroll(event, verticalMode, gridAmmount, window)
+            let imgAmmount = GetImgs($darkmode).length
+            Scroll( event,
+                    imgAmmount,
+                    gridAmmount,
+                    window,
+                    backdropEl
+            )
         }
     }
     onMount(() => {
@@ -85,7 +103,7 @@ on:wheel={OnScroll}/>
         Dark Mode </button>
     </section>
 
-    <div class="{GridClass()}" bind:this={backdropEl}>
+    <div class={GridClass(portfolioScroll, gridAmmount)} bind:this={backdropEl}>
         <!-- First 3-4 images -->
 
         <!-- Darkmode images -->
@@ -100,7 +118,7 @@ on:wheel={OnScroll}/>
         {/each}
 
         <!-- Lightmode images -->
-        <span class="{GridClass()}">
+        <span class={GridClass(portfolioScroll, gridAmmount)}>
         {#if !portfolioScroll}
             {#each GetImgs(false).slice(0, gridAmmount) as imgData, i}
                 {#if introFinished && !$darkmode}

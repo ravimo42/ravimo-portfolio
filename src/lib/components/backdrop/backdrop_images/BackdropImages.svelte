@@ -1,30 +1,20 @@
 <script module lang="ts" >
 	const imageLow = import.meta.glob(
-		'$lib/assets/portfolio/lower/*.jpg',
-		{
+		'$lib/assets/portfolio/lower/*.jpg',{
 			eager: true,
-			query: {
-				enhanced: true
-			}
+			query: { enhanced: true }
 		}
 	)
     const imageHD = import.meta.glob(
-		'$lib/assets/portfolio/hd/*.jpg',
-		{
+		'$lib/assets/portfolio/hd/*.jpg',{
 			eager: true,
-			query: {
-				enhanced: true
-			}
+			query: { enhanced: true }
 		}
 	)
     const imageMetadata = import.meta.glob(
-		'$lib/assets/portfolio/metadata/*.json',
-		{
+		'$lib/assets/portfolio/metadata/*.json',{
 			eager: true,
-			query: {
-				json: true
-			}
-            
+			query: { json: true }
 		}
 	)
     export const Images = () => {

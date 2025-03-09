@@ -31,7 +31,7 @@
 transition:fly={{
         delay: delayDevider !== 0 ? duration / delayDevider * index : 0,
         duration: duration,
-        opacity: 100,
+        opacity: 0,
         y: innerHeight * (index % 2 ? -1 : 1),
         easing: quintOut,
     }}
@@ -71,7 +71,7 @@ transition:fly={{
             <p class="font-bold text-white">{imgMeta.name}
                 <i class="text-white p-2 nf nf-md-magnify_scan">
             </p>
-            <p class=" text-white">ASDDDSSS</p>
+            <p class=" text-white">{imgMeta.name}</p>
         </span>
     </div>
 
